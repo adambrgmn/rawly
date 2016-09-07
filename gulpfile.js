@@ -1,7 +1,10 @@
 const path = require('path');
+const fs = require('fs');
 const gulp = require('gulp');
+const watch = require('gulp-watch');
 const excludeGitignore = require('gulp-exclude-gitignore');
-const mocha = require('gulp-mocha');
+const tape = require('gulp-tape');
+const tap = require('tap-spec');
 const istanbul = require('gulp-istanbul');
 const nsp = require('gulp-nsp');
 const plumber = require('gulp-plumber');
@@ -11,7 +14,9 @@ const isparta = require('isparta');
 
 // Initialize the babel transpiler so ES2015 files gets compiled
 // when they're loaded
-require('babel-register');
+const babelrc = fs.readFileSync(path.join(__dirname, '.babelrc'));
+const config = JSON.parse(babelrc);
+require('babel-register')(config);
 
 gulp.task('static', () => gulp.src('**/*.js')
   .pipe(excludeGitignore()));
@@ -31,16 +36,15 @@ gulp.task('pre-test', () => gulp.src('lib/**/*.js')
   }))
   .pipe(istanbul.hookRequire()));
 
-gulp.task('test', ['pre-test'], (cb) => {
-  let mochaErr;
+gulp.task('test', (cb) => {
+  let testErr;
 
   gulp.src('test/**/*.js')
-    .pipe(plumber())
-    .pipe(mocha({ reporter: 'spec' }))
-    .on('error', (err) => (mochaErr = err))
-    .pipe(istanbul.writeReports())
+    // .pipe(plumber())
+    .pipe(tape({ reporter: tap() }))
+    .on('error', (err) => (testErr = err))
     .on('end', () => {
-      cb(mochaErr);
+      cb(testErr);
     });
 });
 
