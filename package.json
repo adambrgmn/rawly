@@ -43,12 +43,20 @@
     "gulp-mocha": "^2.0.0",
     "gulp-nsp": "^2.1.0",
     "gulp-plumber": "^1.0.0",
-    "isparta": "^4.0.0"
+    "gulp-tape": "0.0.9",
+    "gulp-watch": "^4.3.9",
+    "isparta": "^4.0.0",
+    "tap-spec": "^4.1.1",
+    "tape": "^4.6.0"
   },
   "repository": "adambrgmn/rawly",
   "scripts": {
     "prepublish": "gulp prepublish",
-    "test": "gulp"
+    "test": "gulp test",
+    "test:watch": "gulp watch"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^3.4.6"
+  }
 }
