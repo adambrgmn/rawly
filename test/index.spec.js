@@ -2,61 +2,56 @@ import { join } from 'path';
 import test from 'tape';
 import Rawly from '../lib';
 
-const rawPath = join(__dirname, 'test.CR2');
+const rawPath = join(__dirname, 'test1.CR2');
 
-test('Rawly: constructor()', assert => {
-  const string = 'Should create an instance of Rawly';
-  const actual = new Rawly(rawPath) instanceof Rawly;
-  const expected = true;
+test('@class Rawly.constructor()', assert => {
+  const should = [
+    'Should create an instance of Rawly',
+    'Should return an object with information about file',
+    'Should throw an error if provided path is either non existing or not a string',
+  ];
 
-  assert.equal(actual, expected, string);
-  assert.end();
-});
+  const actual0 = new Rawly(rawPath) instanceof Rawly;
+  const expected0 = true;
+  assert.equal(actual0, expected0, should[0]);
 
-test('Rawly: constructor()', assert => {
-  const string = 'Should return an object with file info';
-  const object = new Rawly(rawPath);
 
-  const actual = {};
-  const expected = {
-    name: 'test.CR2',
+  const actual1 = new Rawly(rawPath);
+  const expected1 = {
+    name: 'test',
+    ext: 'CR2',
     path: __dirname,
     type: 'image/x-canon-cr2',
-    previews: true,
+    size: 24624466,
+    previews: [
+      { name: 'Preview 1', type: 'image/jpeg', dimensions: '160x120', size: 11165 },
+      { name: 'Preview 2', type: 'image/tiff', dimensions: '362x234', size: 508248 },
+      { name: 'Preview 3', type: 'image/jpeg', dimensions: '5616x3744', size: 1705174 },
+    ],
   };
 
-  Object.keys(object).forEach(key => {
-    if (
-      key === 'name' ||
-      key === 'path' ||
-      key === 'type'
-    ) {
-      actual[key] = object[key];
-    } else {
-      actual[key] = object[key] != null;
-    }
-  });
+  assert.deepEqual(actual1, expected1, should[1]);
 
-  assert.deepEqual(actual, expected, string);
+  assert.throws(() => new Rawly(1), should[2]);
+
   assert.end();
 });
 
+const properties = Object
+  .getOwnPropertyNames(Rawly)
+  .filter(property => typeof Rawly[property] === 'function');
 
-/**
- * This package should:
- *  be used something like this:
- *    const file = rawly('path/to/file.CR2');
- *    file // { name: 'file.CR2', path: 'path/to/dir', type: 'Canon RAW', previews: [], methods }
- *    file.hasPreviews // Bool
- *    file.isRaw // Bool
- *    file.hasPreviews // Bool
- *    file.previewsAlreadyRendered // Bool
- *    file.previews // [{
- *                       name: 'file-thumb.jpg',
- *                       type: 'image/jpg',
- *                       dimensions: '160x120',
- *                       size: 11165
- *                     }]
- *    file.extractPreview('thumb', 'optBasename', 'opt/dir') // (creates optBasename-thumb.jpg)
- *    file.extractPreview('all', 'optBasename', 'opt/dir')
- */
+properties.forEach(property => {
+  test(`@class Rawly.${property}`, assert => {
+    const should = [
+      'Should return a string',
+      'Should throw if provided argument is not a string',
+    ];
+    const actual = typeof Rawly[property](rawPath);
+    const expected = 'string';
+
+    assert.equal(actual, expected, should[0]);
+    assert.throws(() => Rawly[property](1), should[1]);
+    assert.end();
+  });
+});
