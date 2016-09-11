@@ -5,8 +5,8 @@ import rimraf from 'rimraf';
 import test from 'tape';
 import Rawly from '../lib';
 
-const cr2Path = join(__dirname, 'test.CR2');
-const jpgPath = join(__dirname, 'test.jpg');
+const cr2Path = join(__dirname, 'raw.CR2');
+const jpgPath = join(__dirname, 'jpeg.jpg');
 
 const statAsync = promisify(fs.stat);
 const rimrafAsync = promisify(rimraf);
@@ -25,7 +25,7 @@ test('@class Rawly.constructor()', assert => {
 
   const actual1 = new Rawly(cr2Path);
   const expected1 = {
-    name: 'test',
+    name: 'raw',
     ext: 'CR2',
     path: __dirname,
     type: 'image/x-canon-cr2',
@@ -110,9 +110,9 @@ test('@class Rawly.extractPreviews', assert => {
     rawly.extractPreviews()
       .then(() => {
         const p = [
-          statAsync(join(__dirname, 'test-preview1.jpg')),
-          statAsync(join(__dirname, 'test-preview2.tif')),
-          statAsync(join(__dirname, 'test-preview3.jpg')),
+          statAsync(join(__dirname, 'raw-preview1.jpg')),
+          statAsync(join(__dirname, 'raw-preview2.tif')),
+          statAsync(join(__dirname, 'raw-preview3.jpg')),
         ];
 
         return Promise.all(p);
@@ -127,7 +127,7 @@ test('@class Rawly.extractPreviews', assert => {
       }),
     // Should extract only a single preview if a number is provided
     rawly.extractPreviews(1)
-      .then(() => statAsync(join(__dirname, 'test-preview1.jpg')))
+      .then(() => statAsync(join(__dirname, 'raw-preview1.jpg')))
       .then(stat => {
         const should = 'Should extract only a single preview if a number is provided';
         const actual = stat.isFile();
@@ -140,8 +140,8 @@ test('@class Rawly.extractPreviews', assert => {
     rawly.extractPreviews([2, 3])
       .then(() => {
         const p = [
-          statAsync(join(__dirname, 'test-preview2.tif')),
-          statAsync(join(__dirname, 'test-preview3.jpg')),
+          statAsync(join(__dirname, 'raw-preview2.tif')),
+          statAsync(join(__dirname, 'raw-preview3.jpg')),
         ];
 
         return Promise.all(p);
