@@ -26,6 +26,7 @@ glob('./images/**/*.(CR2|NEF|...)', (paths) => {
   const rawlys = paths.map((path) => new Rawly(path));
   rawlys.forEach(rawly => {
     console.log(rawly.previews); // eg. [{ id: 1, type: 'image/jpeg', dimensions: '160x120', size: 11165 }, ...]
+
     rawly.extractPreviews(1)
       .then((extracted) => {
         if (extracted) console.log('Extracted a photo...');
@@ -88,7 +89,7 @@ There is also a cli tool at your disposal if you wish.
 
 ```sh
 $ brew install exiv2
-$npm install --global rawly
+$ npm install --global rawly
 ```
 
 ### Usage
