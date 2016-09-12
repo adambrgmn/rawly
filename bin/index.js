@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 const program = require('commander');
-const cli = require('../dist/cli');
+const extract = require('../dist/cli').default;
+const { logSuccess, logError } = require('../dist/utils/log');
 const pkg = require('../package.json');
 
 program
@@ -14,3 +15,7 @@ program
     /^(s|sm|small|smallest|m|md|medium|l|lg|large|largest)$/i
   )
   .parse(process.argv);
+
+extract(program)
+  .then(logSuccess)
+  .catch(logError);
