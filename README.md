@@ -104,7 +104,7 @@ This will extract all possible previews from every file matching your glob patte
 $ rawly './img/**/*.(CR2|NEF|...)' -p largest
 ```
 
-Available keywords are: s, sm, small, smallest, m, md, medium, l, lg, large, largest
+Available keywords are: `s, sm, small, smallest, m, md, medium, l, lg, large, largest`
 
 You can also force Rawly to extract previews even if previews are already present:
 
