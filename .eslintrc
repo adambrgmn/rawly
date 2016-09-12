@@ -10,7 +10,7 @@
   "rules": {
     "strict": 0,
     "no-console": 0,
-    "indent": ["error", 2],
+    indent: ['error', 2, { SwitchCase: 1, VariableDeclarator: 1, outerIIFEBody: 1 }],
     "import/no-extraneous-dependencies": 0,
 
     "babel/generator-star-spacing": 1,
