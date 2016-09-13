@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 const program = require('commander');
-const extract = require('./dist/cli').default;
-const { logSuccess, logError } = require('./dist/utils/log');
-const pkg = require('./package.json');
+const extract = require('../dist/cli').default;
+const { logSuccess, logError } = require('../dist/utils/log');
+const pkg = require('../package.json');
 
 program
   .version(pkg.version)
