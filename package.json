@@ -8,9 +8,10 @@
     "email": "adam@fransvilhelm.com",
     "url": "http://fransvilhelm.com"
   },
-  "bin": "./cli.js",
+  "bin": "./bin/index.js",
   "files": [
-    "dist"
+    "dist",
+    "bin"
   ],
   "main": "dist/index.js",
   "keywords": [
