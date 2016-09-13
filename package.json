@@ -8,7 +8,7 @@
     "email": "adam@fransvilhelm.com",
     "url": "http://fransvilhelm.com"
   },
-  "bin": "./bin/index.js",
+  "bin": "./index.js",
   "files": [
     "dist"
   ],
