@@ -53,7 +53,7 @@
   "repository": "adambrgmn/rawly",
   "scripts": {
     "prepublish": "gulp prepublish",
-    "test": "gulp test"
+    "test": "tape './test/**/*.spec.js' -r ./test/setup | tap-spec"
   },
   "license": "MIT",
   "dependencies": {
@@ -63,6 +63,7 @@
     "commander": "^2.9.0",
     "cross-spawn": "^4.0.0",
     "glob": "^7.0.6",
+    "gm": "^1.23.0",
     "progress": "^1.1.8"
   }
 }

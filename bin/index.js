@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const program = require('commander');
-const extract = require('../dist/cli').default;
+const cli = require('../dist/cli').default;
 const { logSuccess, logError } = require('../dist/utils/log');
 const pkg = require('../package.json');
 
@@ -9,13 +9,10 @@ program
   .version(pkg.version)
   .usage('[options] <glob ...>')
   .option('-f, --force', 'Force overwrite of existing previews')
-  .option(
-    '-p, --previews [value]',
-    'Which preview to extract (eg. "smallest" or "largest")',
-    /^(s|sm|small|smallest|m|md|medium|l|lg|large|largest)$/i
-  )
+  .option('-s, --size [size]', 'Size of extracted preview (eg. "1200x900")')
+  .option('-e, --ending [suffix]', 'String to append to end of file name')
   .parse(process.argv);
 
-extract(program)
+cli(program)
   .then(logSuccess)
   .catch(logError);

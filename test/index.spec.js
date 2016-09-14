@@ -1,5 +1,5 @@
 import { join } from 'path';
-import Promise, { promisify } from 'bluebird';
+import { promisify } from 'bluebird';
 import fs from 'fs';
 import rimraf from 'rimraf';
 import test from 'tape';
@@ -28,12 +28,13 @@ test('@class Rawly.constructor()', assert => {
     name: 'raw',
     ext: 'CR2',
     path: __dirname,
+    fullPath: cr2Path,
     type: 'image/x-canon-cr2',
-    previewsExtracted: false,
+    previewExtracted: false,
     previews: [
-      { id: 1, type: 'image/jpeg', dimensions: '160x120', size: 11165 },
+      { id: 1, type: 'image/jpeg', dimensions: '160x120', size: 13568 },
       { id: 2, type: 'image/tiff', dimensions: '362x234', size: 508248 },
-      { id: 3, type: 'image/jpeg', dimensions: '5616x3744', size: 1705174 },
+      { id: 3, type: 'image/jpeg', dimensions: '5616x3744', size: 1352854 },
     ],
   };
 
@@ -90,73 +91,23 @@ test('@class Rawly.getPreviews', assert => {
 });
 
 
-test('@class Rawly.extractPreviews', assert => {
-  const should = 'Should return a Promise';
-
-  const rawly = new Rawly(cr2Path);
-  const actual = typeof rawly.extractPreviews().then;
-  const expected = 'function';
-
-  assert.equal(actual, expected, should);
-  assert.end();
-});
-
-
-test('@class Rawly.extractPreviews', assert => {
+test('@class Rawly.extractPreview', assert => {
   const rawly = new Rawly(cr2Path);
 
-  const promises = [
-    // Should extract all previews if nothing else is stated
-    rawly.extractPreviews()
-      .then(() => {
-        const p = [
-          statAsync(join(__dirname, 'raw-preview1.jpg')),
-          statAsync(join(__dirname, 'raw-preview2.tif')),
-          statAsync(join(__dirname, 'raw-preview3.jpg')),
-        ];
+  rimrafAsync('./**/raw*.jpg')
+    .then(() => rawly.extractPreview('1200x900'))
+    .then(() => statAsync(join(__dirname, `${rawly.name}.jpg`)))
+    .then((stat) => {
+      const should = 'Should extract a preview';
+      const actual = stat.isFile();
+      const expected = true;
 
-        return Promise.all(p);
-      })
-      .then(array => {
-        const should = 'Should extract all previews if nothing else is stated';
-        const actual = array.map(stat => stat.isFile());
-        const expected = [true, true, true];
-
-        assert.deepEqual(actual, expected, should);
-        return rimrafAsync('./**/*-preview*.*');
-      }),
-    // Should extract only a single preview if a number is provided
-    rawly.extractPreviews(1)
-      .then(() => statAsync(join(__dirname, 'raw-preview1.jpg')))
-      .then(stat => {
-        const should = 'Should extract only a single preview if a number is provided';
-        const actual = stat.isFile();
-        const expected = true;
-
-        assert.deepEqual(actual, expected, should);
-        return rimrafAsync('./**/*-preview*.*');
-      }),
-    // Should accept an array of previews to extract
-    rawly.extractPreviews([2, 3])
-      .then(() => {
-        const p = [
-          statAsync(join(__dirname, 'raw-preview2.tif')),
-          statAsync(join(__dirname, 'raw-preview3.jpg')),
-        ];
-
-        return Promise.all(p);
-      })
-      .then(arr => {
-        const should = 'Should accept an array of previews to extract';
-        const actual = arr.map(stat => stat.isFile());
-        const expected = [true, true];
-
-        assert.deepEqual(actual, expected, should);
-        return rimrafAsync('./**/*-preview*.*');
-      }),
-  ];
-
-  Promise.all(promises)
+      assert.equal(actual, expected, should);
+    })
+    .then(() => rimrafAsync('./**/raw*.jpg'))
     .then(() => assert.end())
-    .catch(assert.end);
+    .catch((err) => {
+      assert.end(err);
+      return rimrafAsync('./**/raw*.jpg');
+    });
 });
