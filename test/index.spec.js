@@ -7,7 +7,6 @@ import test from 'tape';
 import Rawly from '../lib';
 
 const cr2Path = join(__dirname, 'raw.CR2');
-const jpgPath = join(__dirname, 'jpeg.jpg');
 
 const statAsync = promisify(fs.stat);
 const rimrafAsync = promisify(rimraf);
@@ -60,59 +59,55 @@ test('@class Rawly.constructor()', assert => {
 });
 
 
-test('@class Rawly.extractPreview', assert => {
-  const p1 = () => {
-    const rawly = new Rawly(cr2Path);
-    return rimrafAsync('./**/raw*.jpg')
-      .then(() => rawly.extractPreview())
-      .then(() => statAsync(join(__dirname, `${rawly.name}.jpg`)))
-      .then((stat) => {
-        const should = 'Should extract a preview';
-        const actual = stat.isFile();
-        const expected = true;
+test('@class Rawly.extractPreview', (assert) => {
+  const createAndExtract = (dim, suff) => new Rawly(cr2Path).extractPreview(dim, suff);
+  const statCheck = (fileName) => () => statAsync(join(__dirname, fileName));
+  const clear = () => rimrafAsync('./**/raw*.jpg');
 
-        assert.equal(actual, expected, should);
-        return rimrafAsync('./**/raw*.jpg');
-      });
-  };
+  const p = [];
 
-  const p2 = () => {
-    const rawly = new Rawly(cr2Path);
-    return rimrafAsync('./**/raw*.jpg')
-      .then(() => rawly.extractPreview('1200x900'))
-      .then(() => new Promise((resolve) => {
-        sharp('./raw.jpg')
-          .on('info', resolve);
-      }))
-      .then((info) => {
-        const should = 'Should extract a preview and resize it to given dimensions';
-        const actual = [info.width, info.heigth];
-        const expected = [1200, 900];
+  p.push(createAndExtract()
+    .then(statCheck('raw.jpg'))
+    .then((stat) => {
+      const should = 'Should extract a preview';
+      const actual = stat.isFile();
+      const expected = true;
 
-        assert.deepEqual(actual, expected, should);
-        return rimrafAsync('./**/raw*.jpg');
-      });
-  };
+      assert.equal(actual, expected, should);
+      return Promise.resolve();
+    })
+  );
 
-  const p3 = () => {
-    const rawly = new Rawly(cr2Path);
-    return rimrafAsync('./**/raw*.jpg')
-      .then(() => rawly.extractPreview(undefined, '-preview'))
-      .then(() => statAsync(join(__dirname, `${rawly.name}-preview.jpg`)))
-      .then((stat) => {
-        const should = 'Append a suffix to file if one is provided as second argument';
-        const actual = stat.isFile();
-        const expected = true;
+  p.push(createAndExtract('1200x900')
+    .then(() => sharp(join(__dirname, 'raw.jpg')).metadata())
+    .then((meta) => {
+      const should = 'Should resize image to maximum given dimensions';
+      const actual = meta.width <= 1200 && meta.height <= 900;
+      const expected = true;
 
-        assert.equal(actual, expected, should);
-        return rimrafAsync('./**/raw*.jpg');
-      });
-  };
+      assert.equal(actual, expected, should);
+      return Promise.resolve();
+    })
+  );
 
-  return rimrafAsync('./**/raw*.jpg')
-    .then(p1())
-    .then(p2())
-    .then(p3())
+  p.push(createAndExtract(undefined, '-preview')
+    .then(statCheck('raw-preview.jpg'))
+    .then((stat) => {
+      const should = 'Should append a suffix to preview file if provided';
+      const actual = stat.isFile();
+      const expected = true;
+
+      assert.equal(actual, expected, should);
+      return Promise.resolve();
+    })
+  );
+
+  clear()
+    .then(() => Promise.all(p))
+    .then(clear)
     .then(assert.end)
-    .catch(assert.end);
+    .catch((err) => {
+      assert.end(err);
+      return clear();
+    });
 });
