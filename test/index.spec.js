@@ -2,6 +2,7 @@ import { join } from 'path';
 import { promisify } from 'bluebird';
 import fs from 'fs';
 import rimraf from 'rimraf';
+import sharp from 'sharp';
 import test from 'tape';
 import Rawly from '../lib';
 
@@ -25,17 +26,11 @@ test('@class Rawly.constructor()', assert => {
 
   const actual1 = new Rawly(cr2Path);
   const expected1 = {
+    fullPath: cr2Path,
+    path: __dirname,
     name: 'raw',
     ext: 'CR2',
-    path: __dirname,
-    fullPath: cr2Path,
-    type: 'image/x-canon-cr2',
     previewExtracted: false,
-    previews: [
-      { id: 1, type: 'image/jpeg', dimensions: '160x120', size: 13568 },
-      { id: 2, type: 'image/tiff', dimensions: '362x234', size: 508248 },
-      { id: 3, type: 'image/jpeg', dimensions: '5616x3744', size: 1352854 },
-    ],
   };
 
   assert.deepEqual(actual1, expected1, should[1]);
@@ -49,7 +44,6 @@ test('@class Rawly.constructor()', assert => {
   'getFileName',
   'getDirPath',
   'getFileExtension',
-  'getMIMEType',
 ].forEach(property => {
   test(`@class Rawly.${property}`, assert => {
     const should = [
@@ -66,48 +60,59 @@ test('@class Rawly.constructor()', assert => {
 });
 
 
-test('@class Rawly.getPreviews', assert => {
-  const should = [
-    'Should return an array',
-    'Should return an array of objects',
-    'Should return undefined if there are no previews',
-  ];
-
-  const actual0 = Array.isArray(Rawly.getPreviews(cr2Path));
-  const expected0 = true;
-  assert.equal(actual0, expected0, should[0]);
-
-
-  const actual1 = typeof Rawly.getPreviews(cr2Path)[0];
-  const expected1 = 'object';
-  assert.equal(actual1, expected1, should[1]);
-
-
-  const actual2 = Rawly.getPreviews(jpgPath);
-  const expected2 = undefined;
-  assert.equal(actual2, expected2, should[2]);
-
-  assert.end();
-});
-
-
 test('@class Rawly.extractPreview', assert => {
-  const rawly = new Rawly(cr2Path);
+  const p1 = () => {
+    const rawly = new Rawly(cr2Path);
+    return rimrafAsync('./**/raw*.jpg')
+      .then(() => rawly.extractPreview())
+      .then(() => statAsync(join(__dirname, `${rawly.name}.jpg`)))
+      .then((stat) => {
+        const should = 'Should extract a preview';
+        const actual = stat.isFile();
+        const expected = true;
 
-  rimrafAsync('./**/raw*.jpg')
-    .then(() => rawly.extractPreview('1200x900'))
-    .then(() => statAsync(join(__dirname, `${rawly.name}.jpg`)))
-    .then((stat) => {
-      const should = 'Should extract a preview';
-      const actual = stat.isFile();
-      const expected = true;
+        assert.equal(actual, expected, should);
+        return rimrafAsync('./**/raw*.jpg');
+      });
+  };
 
-      assert.equal(actual, expected, should);
-    })
-    .then(() => rimrafAsync('./**/raw*.jpg'))
-    .then(() => assert.end())
-    .catch((err) => {
-      assert.end(err);
-      return rimrafAsync('./**/raw*.jpg');
-    });
+  const p2 = () => {
+    const rawly = new Rawly(cr2Path);
+    return rimrafAsync('./**/raw*.jpg')
+      .then(() => rawly.extractPreview('1200x900'))
+      .then(() => new Promise((resolve) => {
+        sharp('./raw.jpg')
+          .on('info', resolve);
+      }))
+      .then((info) => {
+        const should = 'Should extract a preview and resize it to given dimensions';
+        const actual = [info.width, info.heigth];
+        const expected = [1200, 900];
+
+        assert.deepEqual(actual, expected, should);
+        return rimrafAsync('./**/raw*.jpg');
+      });
+  };
+
+  const p3 = () => {
+    const rawly = new Rawly(cr2Path);
+    return rimrafAsync('./**/raw*.jpg')
+      .then(() => rawly.extractPreview(undefined, '-preview'))
+      .then(() => statAsync(join(__dirname, `${rawly.name}-preview.jpg`)))
+      .then((stat) => {
+        const should = 'Append a suffix to file if one is provided as second argument';
+        const actual = stat.isFile();
+        const expected = true;
+
+        assert.equal(actual, expected, should);
+        return rimrafAsync('./**/raw*.jpg');
+      });
+  };
+
+  return rimrafAsync('./**/raw*.jpg')
+    .then(p1())
+    .then(p2())
+    .then(p3())
+    .then(assert.end)
+    .catch(assert.end);
 });
