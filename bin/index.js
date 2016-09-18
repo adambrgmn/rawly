@@ -4,6 +4,9 @@ const program = require('commander');
 const cli = require('../dist/cli').default;
 const { logSuccess, logError } = require('../dist/utils/log');
 const pkg = require('../package.json');
+const moment = require('moment');
+
+const startTime = moment();
 
 program
   .version(pkg.version)
@@ -14,5 +17,5 @@ program
   .parse(process.argv);
 
 cli(program)
-  .then(logSuccess)
+  .then((extracted) => logSuccess(extracted, startTime))
   .catch(logError);
