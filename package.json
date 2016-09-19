@@ -1,6 +1,6 @@
 {
   "name": "rawly",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Extract previews from raw-files (with much help from Exiftools and Sharp)",
   "homepage": "https://github.com/adambrgmn/rawly#readme",
   "author": {
@@ -50,10 +50,14 @@
     "tap-spec": "^4.1.1",
     "tape": "^4.6.0"
   },
-  "repository": "adambrgmn/rawly",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adambrgmn/rawly.git"
+  },
   "scripts": {
     "prepublish": "gulp prepublish",
-    "test": "tape './test/**/*.spec.js' -r ./test/setup | tap-spec"
+    "test": "tape './test/**/*.spec.js' -r ./test/setup | tap-spec",
+    "v": "npm --no-git-tag-version version"
   },
   "license": "MIT",
   "dependencies": {

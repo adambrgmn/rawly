@@ -28,7 +28,7 @@ glob('./images/**/*.(CR2|NEF|...)', (paths) => {
     rawly.extractPreviews('1200x900', '-preview') // Scale to more reasonable size and append -preview to the end
       .then((extracted) => {
         if (extracted) console.log('Extracted a photo...');
-        if (!extracted) console.log('Skipped this one because a preview was already extracted, and you didn\'t force me...');
+        if (!extracted) console.log('Skipped this one because a preview was already extracted.');
       })
       .catch((err) => console.log(err.message));
   })
@@ -48,8 +48,10 @@ Extract previews of the image. Returns a Promise resolved to either true if an e
 
 If you like you can specify dimensions to scale the preview image to. It will keep aspect ratio and won't crop, so the dimensions might not be exactly as specified.
 
+The second argument is suffix, it's optional. But if it's provided it will append a string to the end of the file name of the extracted preview.
+
 ```js
-rawly.extractPreviews('1200x900')
+rawly.extractPreviews('1200x900', '-preview')
   .then((extracted) => {
     if (extracted) console.log(`Extracted previews for ${this.name}.`);
     if (!extracted) console.log(`Skipped extraction for ${this.name}.`);
@@ -61,16 +63,20 @@ rawly.extractPreviews('1200x900')
 ```
 
 ## Properties
-Each instance of Rawly gets some properties attatched to it which might be useful in your program:
+Each instance of Rawly gets some properties attached to it which might be useful in your program:
 
 ```js
 const rawly = new Rawly('./images/unicorn.CR2');
 console.log(rawly);
-// {
-//   fullPath: './images/unicorn.CR2',
-//   name: 'unicorn',
-//   ext: 'CR2',
-//   path: './images',
+// Will output: {
+//   path: './images/unicorn.CR2',
+//   info: {
+//     root: ''
+//     dir: 'images',
+//     base: 'unicorn.CR2',
+//     ext: '.CR2',
+//     name: 'unicorn',
+//   },
 //   previewExtracted: false,
 // };
 ```
@@ -119,10 +125,10 @@ $ rawly -h # or --help
 
 ## Tests
 Tests are run with [Tape](https://github.com/substack/tape).
-Clone this repo and run tests:
+Clone this repo to run them:
 
 ```sh
-$ git clone https://github.com/adambrgmn/rawly
+$ git clone git@github.com:adambrgmn/rawly.git
 $ cd rawly
 $ npm install
 $ npm test
@@ -132,7 +138,7 @@ $ npm test
 ## Contribution
 Contribution is very welcome. Just open an issue or make a pull-request and we will make things work together.
 
-This package is still in a very early stage and it's not optimal. So if you want som features added, please reach out to me!
+This package is still in a very early stage and it's not optimal. So if you want some features added, please reach out to me!
 
 ## License
 MIT © [Adam Bergman](http://fransvilhelm.com)
