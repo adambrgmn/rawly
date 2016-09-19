@@ -1,6 +1,6 @@
 {
   "name": "rawly",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "description": "Extract previews from raw-files (with much help from exiv2)",
   "homepage": "https://github.com/adambrgmn/rawly#readme",
   "author": {
@@ -15,7 +15,7 @@
   ],
   "main": "dist/index.js",
   "keywords": [
-    "exiv2",
+    "Exiftools",
     "images",
     "raw",
     "CR2",
@@ -53,7 +53,7 @@
   "repository": "adambrgmn/rawly",
   "scripts": {
     "prepublish": "gulp prepublish",
-    "test": "gulp test"
+    "test": "tape './test/**/*.spec.js' -r ./test/setup | tap-spec"
   },
   "license": "MIT",
   "dependencies": {
@@ -63,6 +63,8 @@
     "commander": "^2.9.0",
     "cross-spawn": "^4.0.0",
     "glob": "^7.0.6",
-    "progress": "^1.1.8"
+    "moment": "^2.15.0",
+    "progress": "^1.1.8",
+    "sharp": "^0.16.0"
   }
 }
