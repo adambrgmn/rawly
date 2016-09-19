@@ -1,6 +1,6 @@
 {
   "name": "rawly",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Extract previews from raw-files (with much help from Exiftools and Sharp)",
   "homepage": "https://github.com/adambrgmn/rawly#readme",
   "author": {
