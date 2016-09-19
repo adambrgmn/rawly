@@ -56,7 +56,8 @@
   },
   "scripts": {
     "prepublish": "gulp prepublish",
-    "test": "tape './test/**/*.spec.js' -r ./test/setup | tap-spec"
+    "test": "tape './test/**/*.spec.js' -r ./test/setup | tap-spec",
+    "v": "npm --no-git-tag-version version"
   },
   "license": "MIT",
   "dependencies": {
