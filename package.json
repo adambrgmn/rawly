@@ -15,7 +15,7 @@
   ],
   "main": "dist/index.js",
   "keywords": [
-    "exiv2",
+    "Exiftools",
     "images",
     "raw",
     "CR2",
