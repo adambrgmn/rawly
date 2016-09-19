@@ -1,7 +1,7 @@
 {
   "name": "rawly",
   "version": "0.2.0",
-  "description": "Extract previews from raw-files (with much help from exiv2)",
+  "description": "Extract previews from raw-files (with much help from Exiftools and Sharp)",
   "homepage": "https://github.com/adambrgmn/rawly#readme",
   "author": {
     "name": "Adam Bergman",
