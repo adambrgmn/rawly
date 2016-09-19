@@ -1,4 +1,4 @@
-import { join } from 'path';
+import { join, parse } from 'path';
 import { promisify } from 'bluebird';
 import fs from 'fs';
 import rimraf from 'rimraf';
@@ -25,10 +25,8 @@ test('@class Rawly.constructor()', assert => {
 
   const actual1 = new Rawly(cr2Path);
   const expected1 = {
-    fullPath: cr2Path,
-    path: __dirname,
-    name: 'raw',
-    ext: 'CR2',
+    path: cr2Path,
+    info: parse(cr2Path),
     previewExtracted: false,
   };
 
@@ -36,26 +34,6 @@ test('@class Rawly.constructor()', assert => {
   assert.throws(() => new Rawly(1), should[2]);
 
   assert.end();
-});
-
-
-[
-  'getFileName',
-  'getDirPath',
-  'getFileExtension',
-].forEach(property => {
-  test(`@class Rawly.${property}`, assert => {
-    const should = [
-      'Should return a string',
-      'Should throw if provided argument is not a string',
-    ];
-    const actual = typeof Rawly[property](cr2Path);
-    const expected = 'string';
-
-    assert.equal(actual, expected, should[0]);
-    assert.throws(() => Rawly[property](1), should[1]);
-    assert.end();
-  });
 });
 
 
