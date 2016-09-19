@@ -1,16 +1,16 @@
 # Rawly [![NPM version][npm-image]][npm-url] [![Dependency Status][daviddm-image]][daviddm-url]
-> Extract previews from raw-files (with much help from exiv2)
+> Extract previews from raw-files (with much help from Exiftools and Sharp)
 
 ## The problem
 You have a large set of RAW-images taken by your super camera. And you want to build a great looking showroom on the great internet :smirk:. But how do you preview those CR2's or NEF's to the people? The browser won't be able to show them. And it's very – and I do mean very – time consuming to go through every picture in Photoshop and extract those previews.
 
 ## The solution
 Rawly!
-With some great help from a NodeJS server and the great package [Exiv2](http://www.exiv2.org/). Rawly can iterate over your images and ”magically” extract those previews for you in quite a simple manner.
+With some great help from a NodeJS and workhorses [Exiftools](http://www.sno.phy.queensu.ca/~phil/exiftool/) and [Sharp](http://sharp.dimens.io/en/stable/). Rawly can iterate over your images and ”magically” extract those previews for you in quite a simple manner.
 
 ## Installation
 ```sh
-$ brew install exiv2
+$ brew install exiftools
 $ npm install --save rawly
 ```
 
@@ -25,9 +25,7 @@ import Rawly from 'rawly';
 glob('./images/**/*.(CR2|NEF|...)', (paths) => {
   const rawlys = paths.map((path) => new Rawly(path));
   rawlys.forEach(rawly => {
-    console.log(rawly.previews); // eg. [{ id: 1, type: 'image/jpeg', dimensions: '160x120', size: 11165 }, ...]
-
-    rawly.extractPreviews(1)
+    rawly.extractPreviews('1200x900', '-preview') // Scale to more reasonable size and append -preview to the end
       .then((extracted) => {
         if (extracted) console.log('Extracted a photo...');
         if (!extracted) console.log('Skipped this one because a preview was already extracted, and you didn\'t force me...');
@@ -42,25 +40,23 @@ glob('./images/**/*.(CR2|NEF|...)', (paths) => {
 Create a a new instance of Rawly.
 
 ```js
-const rawly = new Rawly('path/to/an/raw-image');
+const rawly = new Rawly('path/to/a/raw-image');
 ```
 
-### rawly.extractPreviews(id, force)
+### rawly.extractPreviews([size], [suffix])
 Extract previews of the image. Returns a Promise resolved to either true if an extraction took place, or false if a preview was already found in the same folder and it skipped extraction.
 
-Id is optional, in that case Rawly will extract all available previews from that specific file.
-
-Force is also optional and defaults to false. If you set it to true it will force an overwrite of existing previews.
+If you like you can specify dimensions to scale the preview image to. It will keep aspect ratio and won't crop, so the dimensions might not be exactly as specified.
 
 ```js
-rawly.extractPreviews([1, 3], false)
+rawly.extractPreviews('1200x900')
   .then((extracted) => {
-    if (extracted) console.log(`Extracted previews for ${rawly.name}.`);
-    if (!extracted) console.log(`Skipped extraction for ${rawly.name}.`);
+    if (extracted) console.log(`Extracted previews for ${this.name}.`);
+    if (!extracted) console.log(`Skipped extraction for ${this.name}.`);
   })
   .catch((err) => {
     console.error('An error occured:');
-    console.error(err.message);
+    console.error(err);
   });
 ```
 
@@ -71,16 +67,11 @@ Each instance of Rawly gets some properties attatched to it which might be usefu
 const rawly = new Rawly('./images/unicorn.CR2');
 console.log(rawly);
 // {
+//   fullPath: './images/unicorn.CR2',
 //   name: 'unicorn',
 //   ext: 'CR2',
 //   path: './images',
-//   type: 'image/x-canon-cr2',
-//   previewsExtracted: false,
-//   previews: [
-//     { id: 1, type: 'image/jpeg', dimensions: '160x120', size: 11165 },
-//     { id: 2, type: 'image/tiff', dimensions: '362x234', size: 508248 },
-//     { id: 3, type: 'image/jpeg', dimensions: '5616x3744', size: 1705174 },
-//   ],
+//   previewExtracted: false,
 // };
 ```
 
@@ -88,28 +79,26 @@ console.log(rawly);
 There is also a cli tool at your disposal if you wish.
 
 ```sh
-$ brew install exiv2
+$ brew install exiftools
 $ npm install --global rawly
 ```
 
 ### Usage
 ```sh
 $ cd root/of/image-bank
-$ rawly './img/**/*.(CR2|NEF|...)'
+$ rawly './**/*.(CR2|NEF|...)'
 ```
 
-This will extract all possible previews from every file matching your glob pattern. To specify a single preview to extract you can use the -p-flag (or --previews) together with a keyword:
+This will extract all possible previews from every file matching your glob pattern. To specify dimensions, use the -s (or --size) flag:
 
 ```sh
-$ rawly './img/**/*.(CR2|NEF|...)' -p largest
+$ rawly './**/*.(CR2|NEF|...)' -s 1200x900
 ```
 
-Available keywords are: `s, sm, small, smallest, m, md, medium, l, lg, large, largest`
-
-You can also force Rawly to extract previews even if previews are already present:
+To append a suffix to your previews use the -e (or --ending) flag:
 
 ```sh
-$ rawly './img/**/*.(CR2|NEF|...)' -p largest -f # or --force
+$ rawly './**/*.(CR2|NEF|...)' -e 'preview'
 ```
 
 You can also print out this help if you might forget how it works:
@@ -121,10 +110,10 @@ $ rawly -h # or --help
 
   Options:
 
-    -h, --help              output usage information
-    -V, --version           output the version number
-    -f, --force             Force overwrite of existing previews
-    -p, --previews [value]  Which preview to extract (eg. "smallest" or "largest")
+    -h, --help             output usage information
+    -V, --version          output the version number
+    -s, --size [size]      Size of extracted preview (eg. "1200x900")
+    -e, --ending [suffix]  String to append to end of file name
 
 ```
 
@@ -135,7 +124,8 @@ Clone this repo and run tests:
 ```sh
 $ git clone https://github.com/adambrgmn/rawly
 $ cd rawly
-$ npm tests
+$ npm install
+$ npm test
 ```
 
 
