@@ -1,3 +1,5 @@
+**Deprecated and archived due to old codebase and little interest**
+
 # Rawly [![NPM version][npm-image]][npm-url] [![Dependency Status][daviddm-image]][daviddm-url]
 > Extract previews from raw-files (with much help from Exiftools and Sharp)
 
